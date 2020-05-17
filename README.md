@@ -12,7 +12,7 @@ pip install proj_config
 
 2.Insatll redis-server.
 
-3.Set environment variables.
+3.Set environment variables from command line.
 
 ```bash
 export CONF_FOR_REDISCONF="{'host': '172.0.0.1', 'port': 6379, 'db': 0, 'password': 'your_password', 'decode_responses': True}" :$CONF_FOR_REDISCONF
@@ -78,7 +78,7 @@ if __name__ == '__main__':
     print(config)
 ``` 
 
-#### 4.run your proj as config
+#### 4.Run your proj as config from command line.
 ```bash
 python sample.py pro/dev
 ```
