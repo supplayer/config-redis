@@ -54,7 +54,7 @@ print(lookup_proj_config())  # show current project config
 
 ```
 
-#### 3.After you write the proj config to redis then your can chenge setting.py as below.
+#### 3.After write the project config to redis then your can chenge setting.py as below.
 ##### your_proj/setting.py
 ```python
 from projconfig.setconf import devconfig, proconfig, configs, ConfigArgs
@@ -78,7 +78,7 @@ if __name__ == '__main__':
     print(config)
 ``` 
 
-#### 4.Run your proj as config from command line.
+#### 4.Run your project as config from command line.
 ```bash
 python sample.py pro/dev
 ```

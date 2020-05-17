@@ -1,4 +1,4 @@
-from projconfig.setconf import devconfig, proconfig, configs, ConfigArgs, upsert_config_to_redis, lookup_proj_config
+from projconfig.setconf import devconfig, proconfig, configs, ConfigArgs, upsert_config_to_redis
 
 
 con = ConfigArgs()
