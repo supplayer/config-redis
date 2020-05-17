@@ -1,6 +1,6 @@
 import setuptools
 
-with open("README.md") as fh:
+with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
@@ -9,7 +9,6 @@ setuptools.setup(
     author="RoyXing",
     author_email="x254724521@hotmail.com",
     description="Get proj config args from redis",
-    license='MIT',
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/x254724521/proj_config",

@@ -10,7 +10,7 @@ Proj_config is a python library for get project config from redis and don't show
 pip install proj_config
 ```
 
-2.Insatll redis-server.
+2.Install redis-server.
 
 3.Set environment variables from command line.
 
