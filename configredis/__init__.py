@@ -1,4 +1,4 @@
-from .setconf import (
+from configredis.setconf import (
     defultconfig,
     devconfig,
     proconfig,
@@ -8,7 +8,7 @@ from .setconf import (
     lookup_proj_config,
 )
 
-from .setredis import SetRedis
+from configredis.setredis import SetRedis
 
 
 __all__ = [

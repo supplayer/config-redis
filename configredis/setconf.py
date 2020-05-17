@@ -2,7 +2,7 @@ import sys
 import logging
 import os
 import json
-from projconfig.setredis import SetRedis
+from configredis.setredis import SetRedis
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

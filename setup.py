@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="proj-config",
+    name="config-redis",
     version="0.0.8",
     author="RoyXing",
     author_email="x254724521@hotmail.com",

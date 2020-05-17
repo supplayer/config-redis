@@ -1,4 +1,4 @@
-# Proj_config
+# config-redis
 
 Proj_config is a python library for get project config from redis and don't show your config details in the project.
 
@@ -7,7 +7,7 @@ Proj_config is a python library for get project config from redis and don't show
 1.Use the package manager [pip](https://pypi.org/project/proj-config/) to install Proj_config.
 
 ```bash
-pip install proj_config
+pip install config-redis
 ```
 
 2.Install redis-server.
@@ -25,7 +25,7 @@ export CONF_FOR_REDISCONF="{'host': '172.0.0.1', 'port': 6379, 'db': 0, 'passwor
 #### 1.setup your config
 ##### your_proj/setting.py
 ```python
-from projconfig.setconf import devconfig, proconfig, configs, ConfigArgs
+from configredis.setconf import devconfig, proconfig, configs, ConfigArgs
 
 con = ConfigArgs()
 
@@ -46,7 +46,7 @@ config = configs()
 #### 2.Use upsert_config_to_redis func update or insert current config to redis.  lookup_proj_config func to check the config in redis.
 ##### your_proj/setting.py
 ```python
-from projconfig.setconf import upsert_config_to_redis, lookup_proj_config
+from configredis.setconf import upsert_config_to_redis, lookup_proj_config
 
 upsert_config_to_redis()  # update or insert current config to redis.
 
@@ -57,7 +57,7 @@ print(lookup_proj_config())  # show current project config
 #### 3.After write the project config to redis then your can chenge setting.py as below.
 ##### your_proj/setting.py
 ```python
-from projconfig.setconf import devconfig, proconfig, configs, ConfigArgs
+from configredis.setconf import devconfig, proconfig, configs, ConfigArgs
 
 con = ConfigArgs()
 
