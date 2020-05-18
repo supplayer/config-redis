@@ -4,7 +4,7 @@ Proj_config is a python library for get project config from redis and don't show
 
 ## Installation
 
-1.Use the package manager [pip](https://pypi.org/project/proj-config/) to install Proj_config.
+1.Use the package manager [pip](https://pypi.org/project/config-redis/) to install Proj_config.
 
 ```bash
 pip install config-redis
