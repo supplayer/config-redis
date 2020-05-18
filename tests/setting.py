@@ -1,4 +1,4 @@
-from configredis.setconf import devconfig, proconfig, configs, ConfigArgs, upsert_config_to_redis
+from configredis.setconf import devconfig, proconfig, configs, ConfigArgs, upsert_config_to_redis, lookup_proj_config
 
 
 con = ConfigArgs()
@@ -12,6 +12,7 @@ devconfig(
 proconfig(
     sentry=True,
     celery_broker="amqp://user:password@172.0.0.1:5672//",
+    disk_name="TenB"
 )
 
 config = configs()
@@ -19,5 +20,5 @@ config = configs()
 
 if __name__ == '__main__':
     print(config)
-    upsert_config_to_redis()  # update or insert current config to redis.
-    print(lookup_proj_config())  # show current project config
+    # upsert_config_to_redis()  # update or insert current config to redis.
+    # print(lookup_proj_config())  # show current project config
