@@ -1,6 +1,6 @@
 # config-redis
 
-config-redis is a python library for get project config from redis and don't show your config details in the project.
+proj-config is a python library for get project config from redis and don't show your config details in the project.
 
 ## Installation
 
