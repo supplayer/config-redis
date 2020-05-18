@@ -2,7 +2,7 @@ import sys
 import logging
 import os
 import json
-from projconfig.setredis import SetRedis
+from configredis.setredis import SetRedis
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -68,7 +68,7 @@ def configs():
     """
     env = sys.argv[-1].lower()
     if env not in mapping_:
-        logger.warning(' Not catch env args. e.g: python xx.py dev|pro|default')
+        logger.warning(' Not catch env args or defultconfig not setup. e.g: python xx.py dev|pro|default')
         logger.warning(' Will start under dev env? exit: ctrl+c')
         logger.info(f' Current env is dev')
         return mapping_['dev']
