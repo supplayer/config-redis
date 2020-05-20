@@ -1,5 +1,5 @@
 from configredis.setconf import (
-    defultconfig,
+    defaultconfig,
     devconfig,
     proconfig,
     configs,
@@ -12,7 +12,7 @@ from configredis.setredis import SetRedis
 
 
 __all__ = [
-    'defultconfig',
+    'defaultconfig',
     'devconfig',
     'proconfig',
     'configs',
