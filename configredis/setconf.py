@@ -33,9 +33,9 @@ import your config from your config file for connection. e.g: config = configs()
 """
 
 
-def defultconfig(**mapping):
+def defaultconfig(**mapping):
     """
-    set defult env args.
+    set default env args.
     need import this func to your config document.
     :param mapping: dict
     """
