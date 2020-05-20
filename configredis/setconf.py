@@ -39,7 +39,7 @@ def defaultconfig(**mapping):
     need import this func to your config document.
     :param mapping: dict
     """
-    mapping_['defult'] = mapping or mapping_['dev']
+    mapping_['default'] = mapping or mapping_['dev']
 
 
 def devconfig(**mapping):
