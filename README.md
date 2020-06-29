@@ -32,7 +32,7 @@ con = ConfigArgs()
 devconfig(
     disk_name="Ten",
     sentry=False,
-    celery_broker="amqp://user:password@172.0.0.1:5672//",
+    celery_broker="amqp://user:password@0.0.0.0:5672//",
 )
 
 proconfig(
@@ -46,9 +46,9 @@ config = configs()
 #### 2.Use upsert_config_to_redis func update or insert current config to redis.  lookup_proj_config func to check the config in redis.
 ##### your_proj/setting.py
 ```python
-from configredis.setconf import upsert_config_to_redis, lookup_proj_config
+from configredis.setconf import ConfigUpdate, lookup_proj_config
 
-upsert_config_to_redis()  # update or insert current config to redis.
+ConfigUpdate.upsert_config_to_redis()  # update or insert current config to redis.
 
 print(lookup_proj_config())  # show current project config
 
