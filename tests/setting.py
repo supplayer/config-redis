@@ -1,10 +1,14 @@
-from configredis.setconf import devconfig, proconfig, configs, ConfigArgs, upsert_config_to_redis, lookup_proj_config
+from configredis.setconf import defaultconfig, devconfig, proconfig, configs, ConfigArgs, ConfigUpdate, lookup_proj_config
+from configredis.setredis import SetRedis
 
 
 con = ConfigArgs()
 
+defaultconfig(
+    disk_name='TenD'
+)
+
 devconfig(
-    disk_name="Ten",
     sentry=False,
     celery_broker="amqp://user:password@172.0.0.1:5672//",
 )
@@ -15,10 +19,13 @@ proconfig(
     disk_name="TenB"
 )
 
-config = configs()
+config = configs()  # if use ConfigUpdate.upsert_field_to_redis, need use configs for new fields
 
 
 if __name__ == '__main__':
-    print(config)
+    ConfigUpdate.upsert_field_to_redis(disk_name='TenE')
+    print(configs())
     # upsert_config_to_redis()  # update or insert current config to redis.
     # print(lookup_proj_config())  # show current project config
+    # print(SetRedis.getkeys())
+    # SetRedis.delfiels('config_redis')
