@@ -25,7 +25,18 @@ def project_name(path=os.getcwd(), dirs=(".git",), default=None):
 
 
 project_name_ = project_name()
-mapping_ = {}
+
+
+def lookup_proj_config(proj_name=None):
+    """
+    lookup project config on redis.
+    :param proj_name: project name which lookup from redis.
+    """
+    proj_name = proj_name or project_name_
+    return SetRedis().getfiels(proj_name)
+
+
+mapping_ = {**{'default': {}, 'dev': {}, 'pro': {}}, **lookup_proj_config()}
 
 """
 need import below func to your config file.
@@ -39,7 +50,7 @@ def defaultconfig(**mapping):
     need import this func to your config document.
     :param mapping: dict
     """
-    mapping_['default'] = mapping or mapping_['dev']
+    mapping_['default'] = mapping
 
 
 def devconfig(**mapping):
@@ -68,13 +79,13 @@ def configs():
     """
     env = sys.argv[-1].lower()
     if env not in mapping_:
-        logger.warning(' Not catch env args or defultconfig not setup. e.g: python xx.py dev|pro|default')
+        logger.warning(' Not catch env args or defultconfig not setup. e.g: python sample.py dev|pro')
         logger.warning(' Will start under dev env? exit: ctrl+c')
         logger.info(f' Current env is dev')
-        return mapping_['dev']
+        return {**mapping_['dev'], **mapping_['default']}
     else:
         logger.info(f' Current env is {env}')
-        return mapping_[env]
+        return {**mapping_[env], **mapping_['default']}
 
 
 class ConfigArgs:
@@ -89,22 +100,22 @@ class ConfigArgs:
         :param key: name is 'dev'
         :return: SetRedis().getfiels(name) -> dict e.g: {'disk_name': 'TenTBc'}
         """
+        ConfigUpdate.upsert_config_to_redis(notify=True)
         item = SetRedis().getfiels(project_name_)
-        return json.loads(item[key])
+        return json.loads(item.get(key)) if item.get(key) else ''
 
 
-def upsert_config_to_redis():
-    """
-    insert or update current config to redis.
-    """
-    SetRedis().upsert(project_name_, mapping=mapping_)
-    logger.info(f'{project_name_} project config has been written to redis.')
+class ConfigUpdate:
+    @classmethod
+    def upsert_config_to_redis(cls, notify=True):
+        """
+        insert or update current config to redis.
+        """
+        SetRedis().upsert(project_name_, mapping=mapping_, notify=False)
+        logger.info(f"Project: {project_name_}'s config has been written to redis.") if notify else None
 
-
-def lookup_proj_config(proj_name=None):
-    """
-    lookup project config on redis.
-    :param proj_name: project name which lookup from redis.
-    """
-    proj_name = proj_name or project_name_
-    return SetRedis().getfiels(proj_name)
+    @classmethod
+    def upsert_field_to_redis(cls, env='default', notify=True, **kwargs):
+        mapping_[env] = {**mapping_[env], **kwargs}
+        SetRedis().upsert(project_name_, mapping=mapping_, notify=False)
+        logger.info(f"Project: {project_name_}'s {env} config fileds has been written to redis.") if notify else None

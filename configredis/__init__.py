@@ -4,7 +4,7 @@ from configredis.setconf import (
     proconfig,
     configs,
     ConfigArgs,
-    upsert_config_to_redis,
+    ConfigUpdate,
     lookup_proj_config,
 )
 
@@ -18,6 +18,6 @@ __all__ = [
     'configs',
     'SetRedis',
     'ConfigArgs',
-    'upsert_config_to_redis',
+    'ConfigUpdate',
     'lookup_proj_config'
 ]

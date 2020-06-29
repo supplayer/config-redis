@@ -48,16 +48,17 @@ class SetRedis:
             return SetRedis().__obj.get(name)
 
     @staticmethod
-    def upsert(name, mapping=None, **kwargs):
+    def upsert(name, mapping=None, notify=True, **kwargs):
         """
         create or update mapping according fields.
+        :param notify: show log notice.
         :param name: redis key
         :param mapping: <dict> data what is create or update
         """
         mapping = {**mapping, **kwargs} if mapping else kwargs
         mapping = {k: json.dumps(v) for k, v in mapping.items()}
         SetRedis().__obj.hmset(name, mapping)
-        logger.info(f"→{name}← has been setup the mapping: →{mapping}← done.")
+        logger.info(f"→{name}← has been setup the mapping: →{mapping}← done.") if notify else None
 
     @staticmethod
     def delfiels(name, *keys):
