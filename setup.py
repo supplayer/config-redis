@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="config-redis",
-    version="0.1.6",
+    version="0.2.0",
     author="RoyXing",
     author_email="x254724521@hotmail.com",
     description="Get proj config args from redis",
