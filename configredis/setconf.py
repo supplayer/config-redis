@@ -107,11 +107,11 @@ class ConfigArgs:
 
 class ConfigUpdate:
     @classmethod
-    def upsert_config_to_redis(cls, notify=True):
+    def upsert_config_to_redis(cls, mapping=None, notify=True):
         """
         insert or update current config to redis.
         """
-        SetRedis().upsert(project_name_, mapping=mapping_, notify=False)
+        SetRedis().upsert(project_name_, mapping=mapping or mapping_, notify=False)
         logger.info(f"Project: {project_name_}'s config has been written to redis.") if notify else None
 
     @classmethod
