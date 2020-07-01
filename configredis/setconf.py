@@ -33,7 +33,7 @@ def lookup_proj_config(proj_name=None):
     :param proj_name: project name which lookup from redis.
     """
     proj_name = proj_name or project_name_
-    return SetRedis().getfiels(proj_name)
+    return {k: json.loads(v) for k, v in SetRedis().getfiels(proj_name).items()}
 
 
 mapping_ = {**{'default': {}, 'dev': {}, 'pro': {}}, **lookup_proj_config()}
@@ -111,7 +111,7 @@ class ConfigUpdate:
         """
         insert or update current config to redis.
         """
-        SetRedis().upsert(project_name_, mapping=dict(mapping or mapping_), notify=False)
+        SetRedis().upsert(project_name_, mapping=mapping or mapping_, notify=False)
         logger.info(f"Project: {project_name_}'s config has been written to redis.") if notify else None
 
     @classmethod
