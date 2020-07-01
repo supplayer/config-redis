@@ -23,7 +23,7 @@ config = configs()  # if use ConfigUpdate.upsert_field_to_redis, need use config
 
 
 if __name__ == '__main__':
-    # ConfigUpdate.upsert_field_to_redis(disk_name='TenD')
+    ConfigUpdate.upsert_field_to_redis(disk_name='TenD')
     # print(configs())
     # upsert_config_to_redis()  # update or insert current config to redis.
     print(lookup_proj_config())  # show current project config
