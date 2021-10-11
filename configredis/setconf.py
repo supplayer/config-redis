@@ -2,10 +2,15 @@ import sys
 import logging
 import os
 import json
+import socket
 from configredis.setredis import SetRedis
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+
+def host_ip(hostname: str):
+    return socket.gethostbyname(hostname)
 
 
 def project_name(path=os.getcwd(), dirs=(".git",), default=None):
