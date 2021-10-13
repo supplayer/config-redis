@@ -3,7 +3,9 @@ import logging
 import os
 import json
 import socket
+import re
 from configredis.setredis import SetRedis
+from json import dumps, loads
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -76,7 +78,7 @@ def proconfig(**mapping):
     mapping_['pro'] = mapping
 
 
-def configs():
+def configs(replace_domain: str = None):
     """
     get config info according env args. [defult/dev/pro]
     need import this func to your END of config document.
@@ -87,16 +89,32 @@ def configs():
         logger.warning(' Not catch env args or defultconfig not setup. e.g: python sample.py dev|pro')
         logger.warning(' Will start under dev env? exit: ctrl+c')
         logger.info(f' Current env is dev')
-        return {**mapping_['dev'], **mapping_['default']}
+        return __with_domain(replace_domain)
     else:
         logger.info(f' Current env is {env}')
-        return {**mapping_[env], **mapping_['default']}
+        return __with_domain(replace_domain, env)
+
+
+def __with_domain(replace_domain='', env='dev'):
+    return __change_host(
+        {**mapping_[env], **mapping_['default']}, replace_domain
+    ) if replace_domain else {**mapping_[env], **mapping_['default']}
+
+
+def __change_host(conf, domain: str):
+    pattern = r'[\w\.]+' + domain.replace('.', r'\.')
+    conf, pattern = dumps(conf), re.compile(r'' + pattern)
+    n_d = {i: host_ip(i) for i in pattern.findall(conf)}
+    for k, v in n_d.items():
+        conf = conf.replace(k, v)
+    return loads(conf)
 
 
 class ConfigArgs:
     """
     get config args value from redis.
     """
+
     def __getitem__(self, key):
         """
         sample:
