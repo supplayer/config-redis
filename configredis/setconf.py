@@ -1,102 +1,124 @@
+from configredis.setredis import SetRedis
+from json import dumps, loads
 import sys
 import logging
 import os
 import json
 import socket
-from configredis.setredis import SetRedis
+import re
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def host_ip(hostname: str):
-    return socket.gethostbyname(hostname)
+class Tools:
+    @classmethod
+    def host_ip(cls, hostname: str):
+        return socket.gethostbyname(hostname)
+
+    @classmethod
+    def project_name(cls, path=os.getcwd(), dirs=(".git",), default=None):
+        """
+        get current project name.
+        :param path: scripts path
+        :param dirs: save rule e.g: catch git
+        :param default: if set default then save to the default absolute path
+        :return: project root directory name
+        """
+        prev, path = None, os.path.abspath(path)
+        while prev != path:
+            if any(os.path.isdir(os.path.join(path, d)) for d in dirs):
+                return path.split('/')[-1]
+            prev, path = path, os.path.abspath(os.path.join(path, os.pardir))
+        return default
+
+    @classmethod
+    def lookup_redis_proj_config(cls, proj_name=None):
+        """
+        lookup project config on redis.
+        :param proj_name: project name which lookup from redis.
+        """
+        proj_name = proj_name or cls.project_name()
+        return {k: json.loads(v) for k, v in SetRedis().getfiels(proj_name).items()}
+
+    @classmethod
+    def lookup_proj_config(cls, env=None):
+        """
+        lookup current project config.
+        """
+        return SetConfig.mapping_[env] if env else SetConfig.mapping_
 
 
-def project_name(path=os.getcwd(), dirs=(".git",), default=None):
-    """
-    get current project name.
-    :param path: scripts path
-    :param dirs: save rule e.g: catch git
-    :param default: if set default then save to the default absolute path
-    :return: project root directory name
-    """
-    prev, path = None, os.path.abspath(path)
-    while prev != path:
-        if any(os.path.isdir(os.path.join(path, d)) for d in dirs):
-            return path.split('/')[-1]
-        prev, path = path, os.path.abspath(os.path.join(path, os.pardir))
-    return default
+class SetConfig:
+    project_name_ = Tools.project_name()
+    mapping_ = {**{'default': {}, 'dev': {}, 'pro': {}}, **Tools.lookup_redis_proj_config()}
 
+    @classmethod
+    def defaultconfig(cls, **mapping):
+        """
+        set default env args.
+        need import this func to your config document.
+        :param mapping: dict
+        """
+        cls.mapping_['default'] = mapping
 
-project_name_ = project_name()
+    @classmethod
+    def devconfig(cls, **mapping):
+        """
+        set development env args.
+        need import this func to your config document.
+        :param mapping: dict
+        """
+        cls.mapping_['dev'] = mapping
 
+    @classmethod
+    def proconfig(cls, **mapping):
+        """
+        Set production env args.
+        need import this func to your config document.
+        :param mapping: dict
+        """
+        cls.mapping_['pro'] = mapping
 
-def lookup_proj_config(proj_name=None):
-    """
-    lookup project config on redis.
-    :param proj_name: project name which lookup from redis.
-    """
-    proj_name = proj_name or project_name_
-    return {k: json.loads(v) for k, v in SetRedis().getfiels(proj_name).items()}
+    @classmethod
+    def configs(cls, replace_domain: str = None):
+        """
+        get config info according env args. [defult/dev/pro]
+        need import this func to your END of config document.
+        :return: env config info as dict.
+        """
+        env = sys.argv[-1].lower()
+        if env not in cls.mapping_:
+            logger.warning(' Not catch env args or defultconfig not setup. e.g: python sample.py dev|pro')
+            logger.warning(' Will start under dev env? exit: ctrl+c')
+            logger.info(f' Current env is dev')
+            return cls.__with_domain(replace_domain)
+        else:
+            logger.info(f' Current env is {env}')
+            return cls.__with_domain(replace_domain, env)
 
+    @classmethod
+    def __with_domain(cls, replace_domain='', env='dev'):
+        return cls.__change_host(
+            {**cls.mapping_[env], **cls.mapping_['default']}, replace_domain
+        ) if replace_domain else {**cls.mapping_[env], **cls.mapping_['default']}
 
-mapping_ = {**{'default': {}, 'dev': {}, 'pro': {}}, **lookup_proj_config()}
-
-"""
-need import below func to your config file.
-import your config from your config file for connection. e.g: config = configs()
-"""
-
-
-def defaultconfig(**mapping):
-    """
-    set default env args.
-    need import this func to your config document.
-    :param mapping: dict
-    """
-    mapping_['default'] = mapping
-
-
-def devconfig(**mapping):
-    """
-    set development env args.
-    need import this func to your config document.
-    :param mapping: dict
-    """
-    mapping_['dev'] = mapping
-
-
-def proconfig(**mapping):
-    """
-    Set production env args.
-    need import this func to your config document.
-    :param mapping: dict
-    """
-    mapping_['pro'] = mapping
-
-
-def configs():
-    """
-    get config info according env args. [defult/dev/pro]
-    need import this func to your END of config document.
-    :return: env config info as dict.
-    """
-    env = sys.argv[-1].lower()
-    if env not in mapping_:
-        logger.warning(' Not catch env args or defultconfig not setup. e.g: python sample.py dev|pro')
-        logger.warning(' Will start under dev env? exit: ctrl+c')
-        logger.info(f' Current env is dev')
-        return {**mapping_['dev'], **mapping_['default']}
-    else:
-        logger.info(f' Current env is {env}')
-        return {**mapping_[env], **mapping_['default']}
+    @classmethod
+    def __change_host(cls, conf, domain: str):
+        pattern = r'[\w\.]+' + domain.replace('.', r'\.')
+        conf, pattern = dumps(conf), re.compile(r'' + pattern)
+        n_d = {i: Tools.host_ip(i) for i in pattern.findall(conf)}
+        for k, v in n_d.items():
+            conf = conf.replace(k, v)
+        return loads(conf)
 
 
 class ConfigArgs:
     """
     get config args value from redis.
     """
+
     def __getitem__(self, key):
         """
         sample:
@@ -106,21 +128,23 @@ class ConfigArgs:
         :return: SetRedis().getfiels(name) -> dict e.g: {'disk_name': 'TenTBc'}
         """
         ConfigUpdate.upsert_config_to_redis(notify=True)
-        item = SetRedis().getfiels(project_name_)
+        item = SetRedis().getfiels(Tools.project_name())
         return json.loads(item.get(key)) if item.get(key) else ''
 
 
-class ConfigUpdate:
+class ConfigUpdate(SetConfig):
+
     @classmethod
     def upsert_config_to_redis(cls, mapping=None, notify=True):
         """
         insert or update current config to redis.
         """
-        SetRedis().upsert(project_name_, mapping=mapping or mapping_, notify=False)
-        logger.info(f"Project: {project_name_}'s config has been written to redis.") if notify else None
+        SetRedis().upsert(cls.project_name_, mapping=mapping or cls.mapping_, notify=False)
+        logger.info(f"Project: {cls.project_name_}'s config has been written to redis.") if notify else None
 
     @classmethod
     def upsert_field_to_redis(cls, env='default', notify=True, **kwargs):
-        mapping_[env] = {**mapping_[env], **kwargs}
-        SetRedis().upsert(project_name_, mapping=mapping_, notify=False)
-        logger.info(f"Project: {project_name_}'s {env} config fileds has been written to redis.") if notify else None
+        cls.mapping_[env] = {**cls.mapping_[env], **kwargs}
+        SetRedis().upsert(cls.project_name_, mapping=cls.mapping_, notify=False)
+        logger.info(
+            f"Project: {cls.project_name_}'s {env} config fileds has been written to redis.") if notify else None
