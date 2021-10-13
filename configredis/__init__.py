@@ -1,23 +1,5 @@
-from configredis.setconf import (
-    defaultconfig,
-    devconfig,
-    proconfig,
-    configs,
-    ConfigArgs,
-    ConfigUpdate,
-    lookup_proj_config,
-)
-
+from configredis.setconf import SetConfig, Tools, ConfigArgs, ConfigUpdate
 from configredis.setredis import SetRedis
 
 
-__all__ = [
-    'defaultconfig',
-    'devconfig',
-    'proconfig',
-    'configs',
-    'SetRedis',
-    'ConfigArgs',
-    'ConfigUpdate',
-    'lookup_proj_config'
-]
+__all__ = ['SetConfig', 'Tools', 'SetRedis', 'ConfigArgs', 'ConfigUpdate']
