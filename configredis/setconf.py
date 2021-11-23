@@ -215,8 +215,6 @@ class SetConfig(ConfigUpdate):
 
     @classmethod
     def __f_env_conf(cls, env_conf: dict):
-        for k, v in env_conf.items():
-            print(k, type(k), v, type(v))
         return f'{cls.indent(4)}' + f'{cls.indent(4)}'.join(
             [f'{k}="{v}",\n' if isinstance(v, str) else f'{k}={v},\n' for k, v in env_conf.items()]) + ")"
 
