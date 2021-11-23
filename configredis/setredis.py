@@ -10,11 +10,11 @@ logger = logging.getLogger(__name__)
 
 
 class SetRedis:
-    def __init__(self, host=None, port=6379, db=0, password='mozat2014', decode_responses=True, **kwargs):
+    def __init__(self, host=None, port=6379, db=0, decode_responses=True, **kwargs):
         """
         :param kwargs: redis config args.
         """
-        self.__conf_redis = {**{'host': host, 'port': port, 'db': db, 'password': password},
+        self.__conf_redis = {**{'host': host, 'port': port, 'db': db},
                              **kwargs} if host else {}
         self.redis = StrictRedis(connection_pool=ConnectionPool(**{**self.connetion(), **self.__conf_redis}),
                                  decode_responses=decode_responses)
