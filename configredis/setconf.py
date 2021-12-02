@@ -149,7 +149,7 @@ class SetConfig(ConfigUpdate):
         """
         env = sys.argv[-1].lower()
         if not cls.local_mapping_:
-            logger.warning(' Not catch local env args, will use redis env args.')
+            logger.warning(' Not catch local project config, will use Redis project config.')
         conf_mapping_ = cls.local_mapping_ or cls.redis_mapping_
         if env not in conf_mapping_:
             logger.warning(' Not catch env args or defultconfig not setup. e.g: python sample.py dev|pro')
