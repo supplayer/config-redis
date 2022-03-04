@@ -6,16 +6,24 @@ import logging
 import os
 import socket
 import re
+import subprocess
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 redis = SetRedis()
 
 
+def nslookup(hostname):
+    process = subprocess.Popen(['nslookup', hostname], stdout=subprocess.PIPE)
+    return process.communicate()[0].split(b'\n')[-3].replace(b'Address: ', b'').decode('utf-8')
+
+
 class Tools:
+    __IP_Getter = dict(socket=socket.gethostbyname, nslookup=nslookup)
+
     @classmethod
-    def host_ip(cls, hostname: str):
-        return socket.gethostbyname(hostname)
+    def host_ip(cls, hostname: str, ip_getter='socket'):
+        return cls.__IP_Getter[ip_getter](hostname)
 
     @classmethod
     def project_name(cls, path=os.getcwd(), dirs=(".git",), default=None):
@@ -72,16 +80,16 @@ class ConfigUpdate:
         logger.info(f" {cls.project_name_}'s {env} config fileds has been written to redis.") if notify else None
 
     @classmethod
-    def with_domain(cls, configs, replace_domain='', env=None):
+    def with_domain(cls, configs, replace_domain='', env=None, ip_getter='socket'):
         configs = dumps(configs)
-        conf = loads(cls.__change_host(configs, replace_domain) if replace_domain else configs)
+        conf = loads(cls.__change_host(configs, replace_domain, ip_getter) if replace_domain else configs)
         return {**conf.get('default', {}), **conf.get(env)} if env else conf
 
     @classmethod
-    def __change_host(cls, conf, domain: str):
+    def __change_host(cls, conf, domain: str, ip_getter='socket'):
         pattern = r'[\w\.]+' + domain.replace('.', r'\.')
         conf, pattern = conf, re.compile(r'' + pattern)
-        n_d = {i: Tools.host_ip(i) for i in pattern.findall(conf)}
+        n_d = {i: Tools.host_ip(i, ip_getter) for i in pattern.findall(conf)}
         for k, v in n_d.items():
             conf = conf.replace(k, v)
         return conf
@@ -141,7 +149,7 @@ class SetConfig(ConfigUpdate):
         cls.local_mapping_[env_] = mapping
 
     @classmethod
-    def configs(cls, replace_domain: str = None, on_redis=True):
+    def configs(cls, replace_domain: str = None, on_redis=True, ip_getter='socket'):
         """
         get config info according env args. [defult/dev/pro]
         need import this func to your END of config document.
@@ -158,7 +166,7 @@ class SetConfig(ConfigUpdate):
         logger.info(f' Current env is {env}\n')
         if on_redis:
             cls.upsert_config_to_redis(cls.local_mapping_, notify=False)
-        return cls.with_domain(conf_mapping_, replace_domain, env)
+        return cls.with_domain(conf_mapping_, replace_domain, env, ip_getter)
 
     @classmethod
     def delconfs(cls, proj_name=None):
