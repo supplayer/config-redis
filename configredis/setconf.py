@@ -15,7 +15,10 @@ redis = SetRedis()
 
 def nslookup(hostname):
     process = subprocess.Popen(['nslookup', hostname], stdout=subprocess.PIPE)
-    return process.communicate()[0].split(b'\n')[-3].replace(b'Address: ', b'').decode('utf-8')
+    ip = process.communicate()[0].split(b'\n')[-3].replace(b'Address: ', b'').decode('utf-8')
+    if 'NXDOMAIN' in ip:
+        raise ValueError(ip)
+    return ip
 
 
 class Tools:
